@@ -108,7 +108,7 @@ function Opening() {
 
 export default function Portfolio() {
   return (
-    <div id="work">
+    <div id="work" className="scroll-mt-20">
       <Opening />
       {categories.map((category) => (
         <Section key={category.slug} category={category} />
