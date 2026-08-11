@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { contactLinks } from "@/lib/links";
+
 const ARCH = "999px 999px 6px 6px";
 
 export default function Hero() {
@@ -56,9 +58,21 @@ export default function Hero() {
             and how she thinks about clay. Wheel-thrown and hand-built vessels,
             glazed in small batches, fired in the studio kiln.
           </p>
-          <p className="mt-8 text-[0.75rem] uppercase tracking-[0.24em] text-ink-400">
-            Based in <span className="text-lilac">— placeholder —</span>
-          </p>
+          <ul className="mt-8 flex flex-wrap items-center gap-2.5">
+            {contactLinks.map(({ label, href, external }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  {...(external
+                    ? { target: "_blank", rel: "noreferrer noopener" }
+                    : {})}
+                  className="inline-block rounded-full border border-ink/15 px-4 py-2 text-[0.7rem] uppercase tracking-[0.2em] text-ink-600 transition-colors duration-300 hover:border-lilac/60 hover:bg-lilac-100/50 hover:text-lilac motion-reduce:transition-none"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
