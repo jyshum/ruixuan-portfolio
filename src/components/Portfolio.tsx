@@ -84,9 +84,32 @@ function Section({ category }: { category: Category }) {
   );
 }
 
+function Opening() {
+  return (
+    <div className="scroll-mt-24 px-6 pb-4 pt-16 md:px-12 md:pb-8 md:pt-24">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-end gap-x-8 gap-y-8 md:grid-cols-12">
+        <Reveal className="md:col-span-7">
+          <h2 className="font-display text-[min(11vw,9rem)] leading-[0.82] tracking-[-0.025em]">
+            Port<span className="italic text-lilac">folio</span>
+          </h2>
+        </Reveal>
+
+        <Reveal delay={100} className="md:col-span-4 md:col-start-9">
+          <p className="max-w-sm text-[0.95rem] leading-[1.75] text-ink-600 md:pb-3">
+            Placeholder — a few lines on where I want to take ceramics next: the
+            forms I want to keep chasing, the glazes and firings I still want to
+            test, and the kind of studio practice I hope to build around it.
+          </p>
+        </Reveal>
+      </div>
+    </div>
+  );
+}
+
 export default function Portfolio() {
   return (
     <div id="work">
+      <Opening />
       {categories.map((category) => (
         <Section key={category.slug} category={category} />
       ))}

@@ -28,7 +28,10 @@ body {
 }
 
 body {
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Jost carries no CJK, so the name 许瑞轩 falls through to a system face that
+     sits close to it in weight rather than to a default serif. */
+  font-family: var(--font-sans), "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

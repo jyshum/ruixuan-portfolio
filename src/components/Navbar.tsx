@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const links = [
   { href: "/#work", label: "Portfolio", muted: false },
-  { href: "/other-work", label: "Other Work", muted: true },
+  { href: "/", label: "About Me", muted: true },
 ];
 
 export default function Navbar() {

@@ -81,16 +81,8 @@ export type Category = {
 
 export const categories: Category[] = [
   {
-    slug: "asia-course",
-    index: "01",
-    title: "Asia Course",
-    blurb:
-      "Placeholder — a sentence on what this body of work is and when it was made.",
-    photos: asiaCourse,
-  },
-  {
     slug: "club",
-    index: "02",
+    index: "01",
     title: "Club",
     blurb:
       "Placeholder — a sentence on the club work, the forms, the glazes used.",
@@ -98,10 +90,18 @@ export const categories: Category[] = [
   },
   {
     slug: "school",
-    index: "03",
+    index: "02",
     title: "School",
     blurb:
       "Placeholder — a sentence on the school pieces and what they were exploring.",
     photos: school,
+  },
+  {
+    slug: "asia-course",
+    index: "03",
+    title: "Asia Course",
+    blurb:
+      "Placeholder — a sentence on what this body of work is and when it was made.",
+    photos: asiaCourse,
   },
 ];
