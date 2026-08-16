@@ -1,40 +1,49 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 
 import Reveal from "./Reveal";
 import { categories, type Category } from "@/lib/portfolio";
-import type { Tile, Wall } from "@/lib/walls";
+import { wallRows, type PhoneTile, type Wall } from "@/lib/walls";
 
 /**
- * The walls are drawn as free compositions rather than packed rows, so each one
- * is laid out on the reference canvas it was designed on and scaled as a whole.
- * Percentages against that canvas mean the gaps between photos hold their exact
- * proportions at any width — nothing reflows, so nothing drifts out of place.
+ * The walls are drawn as free compositions rather than packed rows, so from md
+ * up each one is laid out on the reference canvas it was designed on and scaled
+ * as a whole. Percentages against that canvas mean the gaps between photos hold
+ * their exact proportions — nothing reflows, so nothing drifts out of place.
+ *
+ * A phone is too narrow to read that composition at scale, so below md the same
+ * tiles reflow into justified rows. Both layouts are driven by the custom
+ * properties set here and switched in globals.css.
  *
  * To move a photo, change its x/y/w/h in walls.ts; they are plain pixels in the
- * 1685px-wide space of the layout screenshots in public/.
+ * 1685px-wide space of the layout screenshots in design/layouts/.
  */
 function pct(part: number, whole: number) {
   return `${((part / whole) * 100).toFixed(4)}%`;
 }
 
-function Frame({ tile, wall, alt }: { tile: Tile; wall: Wall; alt: string }) {
+function Frame({ tile, wall, alt }: { tile: PhoneTile; wall: Wall; alt: string }) {
   const [u0, v0, u1, v1] = tile.crop;
   const cw = u1 - u0;
   const ch = v1 - v0;
 
-  // Widest the frame ever renders: the wall fills 9 of 12 columns of a 1400px
-  // container. The source is scaled up by 1/cw to fill the frame after cropping.
-  const shown = (tile.w / wall.ref.w) / cw;
+  // How much of the viewport the photo covers, before the crop scales it up:
+  // most of the row on a phone, a share of the 9-of-12 column from md up.
+  const phone = Math.ceil(((tile.frac * 94) / cw) * 10) / 10;
+  const desk = Math.ceil((((tile.w / wall.ref.w) * 70) / cw) * 10) / 10;
 
   return (
     <div
-      className="absolute"
-      style={{
-        left: pct(tile.x, wall.ref.w),
-        top: pct(tile.y, wall.ref.h),
-        width: pct(tile.w, wall.ref.w),
-        height: pct(tile.h, wall.ref.h),
-      }}
+      className="wall-tile"
+      style={
+        {
+          "--ar": (tile.w / tile.h).toFixed(4),
+          "--x": pct(tile.x, wall.ref.w),
+          "--y": pct(tile.y, wall.ref.h),
+          "--w": pct(tile.w, wall.ref.w),
+          "--h": pct(tile.h, wall.ref.h),
+        } as CSSProperties
+      }
     >
       <Reveal
         delay={tile.delay}
@@ -56,7 +65,7 @@ function Frame({ tile, wall, alt }: { tile: Tile; wall: Wall; alt: string }) {
             alt={alt}
             fill
             loading="lazy"
-            sizes={`(max-width: 768px) ${Math.ceil(shown * 92)}vw, ${Math.ceil(shown * 70)}vw`}
+            sizes={`(max-width: 768px) ${phone}vw, ${desk}vw`}
             style={{ objectFit: "cover" }}
           />
         </div>
@@ -68,40 +77,45 @@ function Frame({ tile, wall, alt }: { tile: Tile; wall: Wall; alt: string }) {
 function TheWall({ wall, title }: { wall: Wall; title: string }) {
   return (
     <div
-      className="relative w-full [container-type:inline-size]"
-      style={{ aspectRatio: `${wall.ref.w} / ${wall.ref.h}` }}
+      className="wall w-full [container-type:inline-size]"
+      style={{ "--wall-ar": `${wall.ref.w} / ${wall.ref.h}` } as CSSProperties}
     >
-      {wall.tiles.map((tile) => (
-        <Frame
-          key={`${tile.src}-${tile.x}-${tile.y}`}
-          tile={tile}
-          wall={wall}
-          alt={`Ceramic work by RuiXuan Xu — ${title}`}
-        />
-      ))}
-
-      {wall.labels.map((label) => (
-        <div
-          key={`${label.text}-${label.y}`}
-          className="absolute flex items-center"
-          style={{
-            left: pct(label.x, wall.ref.w),
-            top: pct(label.y, wall.ref.h),
-            width: pct(label.w, wall.ref.w),
-            height: pct(label.h, wall.ref.h),
-          }}
-        >
-          <Reveal>
-            <p
-              className="whitespace-nowrap font-display italic leading-none tracking-[0.02em] text-ink"
-              // Sized off the wall's own width so it scales with the composition.
-              style={{ fontSize: `${((label.h / wall.ref.w) * 100 * 1.25).toFixed(3)}cqw` }}
-            >
-              {label.text}
-            </p>
-          </Reveal>
-        </div>
-      ))}
+      {wallRows(wall).map((row) =>
+        row.kind === "label" ? (
+          <div
+            key={`label-${row.label.text}-${row.y}`}
+            className="wall-label"
+            style={
+              {
+                // The drawn size, as a share of the wall's own width so it
+                // tracks the composition instead of the viewport.
+                "--fs": `${((row.label.h / wall.ref.w) * 100 * 1.25).toFixed(3)}cqw`,
+                "--x": pct(row.label.x, wall.ref.w),
+                "--y": pct(row.label.y, wall.ref.h),
+                "--w": pct(row.label.w, wall.ref.w),
+                "--h": pct(row.label.h, wall.ref.h),
+              } as CSSProperties
+            }
+          >
+            <Reveal>
+              <p className="whitespace-nowrap font-display italic leading-none tracking-[0.02em] text-ink">
+                {row.label.text}
+              </p>
+            </Reveal>
+          </div>
+        ) : (
+          <div key={`row-${row.y}-${row.tiles[0].src}`} className="wall-row">
+            {row.tiles.map((tile) => (
+              <Frame
+                key={`${tile.src}-${tile.x}-${tile.y}`}
+                tile={tile}
+                wall={wall}
+                alt={`Ceramic work by RuiXuan Xu — ${title}`}
+              />
+            ))}
+          </div>
+        ),
+      )}
     </div>
   );
 }

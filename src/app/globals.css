@@ -39,3 +39,66 @@ body {
   background-color: var(--color-lilac-100);
   color: var(--color-ink);
 }
+
+/* Portfolio walls.
+   One DOM, two layouts — the tiles carry their geometry as custom properties and
+   the breakpoint decides which set is read, so no photo is ever in the markup
+   twice. Phones get justified rows (see wallRows in lib/walls.ts); from md up
+   the wall becomes a canvas and every tile takes its drawn position. */
+.wall {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.wall-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wall-tile {
+  /* Grow in proportion to the photo's aspect, so a row ends up flush with one
+     shared height. Scaled by 100 because grow factors summing to under 1 leave
+     part of the row's free space undistributed. */
+  flex-grow: calc(var(--ar) * 100);
+  flex-shrink: 1;
+  flex-basis: 0;
+  aspect-ratio: var(--ar);
+}
+
+.wall-label {
+  /* the drawn size, but never so small it stops being readable */
+  font-size: max(0.82rem, var(--fs));
+}
+
+@media (min-width: 768px) {
+  .wall {
+    display: block;
+    position: relative;
+    aspect-ratio: var(--wall-ar);
+  }
+
+  /* the rows are a phone-only grouping; on the canvas the tiles place themselves */
+  .wall-row {
+    display: contents;
+  }
+
+  .wall-tile,
+  .wall-label {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    height: var(--h);
+  }
+
+  .wall-tile {
+    flex: none;
+    aspect-ratio: auto;
+  }
+
+  .wall-label {
+    display: flex;
+    align-items: center;
+  }
+}

@@ -33,6 +33,111 @@ export type Wall = {
   gaps: Gap[];
 };
 
+/* ------------------------------------------------------------------ *
+ * Phone layout
+ *
+ * Held to its drawn proportions on a phone, a wall becomes a postcard of
+ * itself: two thirds of these photos land under 120px and the composition's
+ * generous margins turn into dead space. So below the md breakpoint the wall
+ * reflows — photos that were drawn beside each other stay beside each other,
+ * but each group is set as a justified row across the full width.
+ *
+ * These numbers describe the phone, not the drawing: the wall is 342px wide on
+ * a 390px screen, and a photo below MIN_TILE is too small to read.
+ * ------------------------------------------------------------------ */
+const PHONE_ROW = 342;
+const PHONE_GAP = 8;
+const MAX_PER_ROW = 3;
+const MIN_TILE = 100;
+/** three landscape photos across is a 82px-tall strip — too short to read */
+const MIN_ROW_H = 100;
+/** a lone narrow crop at full width would tower over the screen */
+const MAX_ROW_H = 520;
+
+const aspect = (t: Tile) => t.w / t.h;
+
+function rowWidths(tiles: Tile[]): number[] {
+  const avail = PHONE_ROW - PHONE_GAP * (tiles.length - 1);
+  const sum = tiles.reduce((acc, t) => acc + aspect(t), 0);
+  return tiles.map((t) => (avail * aspect(t)) / sum);
+}
+
+/** every tile in a justified row shares this height */
+function rowHeight(tiles: Tile[]): number {
+  return rowWidths(tiles)[0] / aspect(tiles[0]);
+}
+
+export type PhoneTile = Tile & { /** share of the row's width, 0..1 */ frac: number };
+export type WallRow =
+  | { kind: "row"; y: number; tiles: PhoneTile[] }
+  | { kind: "label"; y: number; label: Label };
+
+/** Groups a wall's tiles the way the drawing groups them, then splits any group
+ *  too wide to read on a phone. Order — and so the desktop DOM — is top to bottom. */
+export function wallRows(wall: Wall): WallRow[] {
+  // A "band" is one moment in the wall: every tile whose vertical span overlaps.
+  const bands: Tile[][] = [];
+  let band: Tile[] = [];
+  let bottom = -1;
+  for (const tile of [...wall.tiles].sort((a, b) => a.y - b.y || a.x - b.x)) {
+    if (band.length && tile.y >= bottom) {
+      bands.push(band);
+      band = [];
+      bottom = -1;
+    }
+    band.push(tile);
+    bottom = Math.max(bottom, tile.y + tile.h);
+  }
+  if (band.length) bands.push(band);
+
+  const rows: WallRow[] = [];
+  for (const b of bands) {
+    b.sort((a, c) => a.x - c.x || a.y - c.y);
+
+    const packed: Tile[][] = [];
+    let current: Tile[] = [];
+    for (const tile of b) {
+      const trial = [...current, tile];
+      const tooSmall =
+        Math.min(...rowWidths(trial)) < MIN_TILE || rowHeight(trial) < MIN_ROW_H;
+      if (current.length && (trial.length > MAX_PER_ROW || tooSmall)) {
+        packed.push(current);
+        current = [tile];
+      } else {
+        current = trial;
+      }
+    }
+    if (current.length) packed.push(current);
+
+    // Splitting can strand a tall narrow crop on its own. Those read as accents
+    // in the drawing, not headliners, so put them back beside their neighbour
+    // even though it costs them some width.
+    for (let i = 0; i < packed.length; i += 1) {
+      const row = packed[i];
+      if (row.length !== 1 || PHONE_ROW / aspect(row[0]) <= MAX_ROW_H) continue;
+      const before = packed[i - 1];
+      const after = packed[i + 1];
+      if (before && before.length < MAX_PER_ROW) before.push(row[0]);
+      else if (after && after.length < MAX_PER_ROW) after.unshift(row[0]);
+      else continue;
+      packed.splice(i, 1);
+      i -= 1;
+    }
+
+    for (const row of packed) {
+      const widths = rowWidths(row);
+      rows.push({
+        kind: "row",
+        y: Math.min(...row.map((t) => t.y)),
+        tiles: row.map((t, i) => ({ ...t, frac: widths[i] / PHONE_ROW })),
+      });
+    }
+  }
+
+  for (const label of wall.labels) rows.push({ kind: "label", y: label.y, label });
+  return rows.sort((a, b) => a.y - b.y);
+}
+
 export const club: Wall = {
   ref: { w: 1685, h: 10771 },
   tiles: [
@@ -56,7 +161,8 @@ export const club: Wall = {
     { src: "/club-26.jpg", x: 184, y: 6886, w: 1416, h: 792, crop: [0.0, 0.0, 1.0, 1.0], delay: 0 },
     { src: "/club-2.jpg", x: 140, y: 7721, w: 710, h: 534, crop: [0.0, 0.0, 0.992, 1.0], delay: 0 },
     { src: "/club-8.jpg", x: 881, y: 7721, w: 719, h: 534, crop: [0.0, 0.01, 1.0, 1.0], delay: 90 },
-    { src: "/club-9.jpg", x: 878, y: 8281, w: 722, h: 531, crop: [0.0, 0.009, 1.0, 0.99], delay: 0 },
+    { src: "/club-27.webp", x: 139, y: 8279, w: 710, h: 533, crop: [0.0, 0.0, 1.0, 1.0], delay: 0 },
+    { src: "/club-9.jpg", x: 878, y: 8281, w: 722, h: 531, crop: [0.0, 0.009, 1.0, 0.99], delay: 90 },
     { src: "/club-6.jpg", x: 883, y: 9078, w: 717, h: 539, crop: [0.0, 0.0, 1.0, 1.0], delay: 0 },
     { src: "/club-1.jpg", x: 463, y: 9262, w: 391, h: 502, crop: [0.0, 0.0, 1.0, 0.963], delay: 90 },
     { src: "/club-5.jpg", x: 881, y: 9667, w: 719, h: 538, crop: [0.0, 0.0, 1.0, 1.0], delay: 90 },
@@ -66,9 +172,7 @@ export const club: Wall = {
   labels: [
     { text: "2024-2025", x: 645, y: 9210, w: 137, h: 24 },
   ],
-  gaps: [
-    { x: 139, y: 8279, w: 710, h: 533 },
-  ],
+  gaps: [],
 };
 
 export const school: Wall = {
