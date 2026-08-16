@@ -21,7 +21,10 @@ export default function Hero() {
 
       <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-8 md:gap-y-0">
         {/* eyebrow */}
-        <p className="flex items-center text-[0.7rem] uppercase tracking-[0.3em] text-ink-400 md:col-span-12 md:row-start-1 md:text-[0.75rem]">
+        {/* z-30: the name below sets 205px type on 164px leading, so its glyph
+            box overflows ~20px above its own line box and — being z-20 so it can
+            cover the photo — swallowed every click on the resume link. */}
+        <p className="relative z-30 flex items-center text-[0.7rem] uppercase tracking-[0.3em] text-ink-400 md:col-span-12 md:row-start-1 md:text-[0.75rem]">
           Ceramics Portfolio
           <span aria-hidden className="mx-3 text-ink-400/45 md:mx-4">
             |
