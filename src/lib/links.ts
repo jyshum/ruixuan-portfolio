@@ -1,3 +1,17 @@
+/**
+ * The portfolio's sections, in the order they appear on the page. Lives here
+ * rather than in portfolio.ts so the navbar can list them without pulling the
+ * walls' placement data into the client bundle; portfolio.ts builds its
+ * categories from this, so the two cannot drift.
+ */
+export type Section = { slug: string; title: string };
+
+export const sections: Section[] = [
+  { slug: "club", title: "Club" },
+  { slug: "school", title: "School" },
+  { slug: "asia-course", title: "Asia Course" },
+];
+
 export type ContactLink = {
   label: string;
   href: string;
