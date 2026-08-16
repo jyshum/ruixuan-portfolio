@@ -27,7 +27,7 @@ export default function Hero() {
             |
           </span>
           <a
-            href="/resume.pdf"
+            href="/ruixuan-xu-resume.pdf"
             target="_blank"
             rel="noreferrer noopener"
             className="group inline-flex items-center gap-1.5 border-b border-lilac/40 pb-0.5 text-lilac transition-colors duration-300 hover:border-lilac motion-reduce:transition-none"
