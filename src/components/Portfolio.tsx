@@ -1,34 +1,112 @@
 import Image from "next/image";
 
 import Reveal from "./Reveal";
-import {
-  categories,
-  justify,
-  lastRowSpacer,
-  type Category,
-} from "@/lib/portfolio";
+import { categories, type Category } from "@/lib/portfolio";
+import type { Tile, Wall } from "@/lib/walls";
 
-function Frame({ src, ar, alt }: { src: string; ar: number; alt: string }) {
+/**
+ * The walls are drawn as free compositions rather than packed rows, so each one
+ * is laid out on the reference canvas it was designed on and scaled as a whole.
+ * Percentages against that canvas mean the gaps between photos hold their exact
+ * proportions at any width — nothing reflows, so nothing drifts out of place.
+ *
+ * To move a photo, change its x/y/w/h in walls.ts; they are plain pixels in the
+ * 1685px-wide space of the layout screenshots in public/.
+ */
+function pct(part: number, whole: number) {
+  return `${((part / whole) * 100).toFixed(4)}%`;
+}
+
+function Frame({ tile, wall, alt }: { tile: Tile; wall: Wall; alt: string }) {
+  const [u0, v0, u1, v1] = tile.crop;
+  const cw = u1 - u0;
+  const ch = v1 - v0;
+
+  // Widest the frame ever renders: the wall fills 9 of 12 columns of a 1400px
+  // container. The source is scaled up by 1/cw to fill the frame after cropping.
+  const shown = (tile.w / wall.ref.w) / cw;
+
   return (
     <div
-      className="group relative shrink-0 overflow-hidden rounded-[3px] bg-cream-300"
-      style={{ flexGrow: ar, flexBasis: 0, aspectRatio: ar }}
+      className="absolute"
+      style={{
+        left: pct(tile.x, wall.ref.w),
+        top: pct(tile.y, wall.ref.h),
+        width: pct(tile.w, wall.ref.w),
+        height: pct(tile.h, wall.ref.h),
+      }}
     >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        loading="lazy"
-        sizes="(max-width: 768px) 92vw, 32vw"
-        className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.035] motion-reduce:transition-none"
-      />
+      <Reveal
+        delay={tile.delay}
+        className="group relative h-full w-full overflow-hidden rounded-[3px] bg-cream-300"
+      >
+        {/* Blown up to 1/crop and pulled back by the crop origin, so the frame
+            above shows exactly the part of the photo the layout called for. */}
+        <div
+          className="absolute transition-transform duration-[1200ms] ease-out group-hover:scale-[1.035] motion-reduce:transition-none"
+          style={{
+            width: `${(100 / cw).toFixed(4)}%`,
+            height: `${(100 / ch).toFixed(4)}%`,
+            left: `${((-u0 / cw) * 100).toFixed(4)}%`,
+            top: `${((-v0 / ch) * 100).toFixed(4)}%`,
+          }}
+        >
+          <Image
+            src={tile.src}
+            alt={alt}
+            fill
+            loading="lazy"
+            sizes={`(max-width: 768px) ${Math.ceil(shown * 92)}vw, ${Math.ceil(shown * 70)}vw`}
+            style={{ objectFit: "cover" }}
+          />
+        </div>
+      </Reveal>
+    </div>
+  );
+}
+
+function TheWall({ wall, title }: { wall: Wall; title: string }) {
+  return (
+    <div
+      className="relative w-full [container-type:inline-size]"
+      style={{ aspectRatio: `${wall.ref.w} / ${wall.ref.h}` }}
+    >
+      {wall.tiles.map((tile) => (
+        <Frame
+          key={`${tile.src}-${tile.x}-${tile.y}`}
+          tile={tile}
+          wall={wall}
+          alt={`Ceramic work by RuiXuan Xu — ${title}`}
+        />
+      ))}
+
+      {wall.labels.map((label) => (
+        <div
+          key={`${label.text}-${label.y}`}
+          className="absolute flex items-center"
+          style={{
+            left: pct(label.x, wall.ref.w),
+            top: pct(label.y, wall.ref.h),
+            width: pct(label.w, wall.ref.w),
+            height: pct(label.h, wall.ref.h),
+          }}
+        >
+          <Reveal>
+            <p
+              className="whitespace-nowrap font-display italic leading-none tracking-[0.02em] text-ink"
+              // Sized off the wall's own width so it scales with the composition.
+              style={{ fontSize: `${((label.h / wall.ref.w) * 100 * 1.25).toFixed(3)}cqw` }}
+            >
+              {label.text}
+            </p>
+          </Reveal>
+        </div>
+      ))}
     </div>
   );
 }
 
 function Section({ category }: { category: Category }) {
-  const rows = justify(category.photos);
-
   return (
     <section
       id={category.slug}
@@ -48,36 +126,14 @@ function Section({ category }: { category: Category }) {
               {category.blurb}
             </p>
             <p className="mt-5 text-[0.7rem] uppercase tracking-[0.24em] text-ink-400">
-              {category.photos.length} pieces
+              {category.wall.tiles.length} pieces
             </p>
           </div>
         </div>
 
         {/* the wall */}
-        <div className="flex flex-col gap-3 md:col-span-9 md:gap-4">
-          {rows.map((row, r) => {
-            const spacer =
-              r === rows.length - 1 ? lastRowSpacer(row, r) : 0;
-            return (
-              <Reveal key={r} className="flex flex-col gap-3 md:flex-row md:gap-4">
-                {row.map((tile) => (
-                  <Frame
-                    key={tile.src}
-                    src={tile.src}
-                    ar={tile.ar}
-                    alt={`Ceramic work by RuiXuan Xu — ${category.title}`}
-                  />
-                ))}
-                {spacer > 0 && (
-                  <div
-                    aria-hidden
-                    className="hidden md:block"
-                    style={{ flexGrow: spacer, flexBasis: 0 }}
-                  />
-                )}
-              </Reveal>
-            );
-          })}
+        <div className="md:col-span-9">
+          <TheWall wall={category.wall} title={category.title} />
         </div>
       </div>
     </section>
