@@ -86,7 +86,12 @@ export default function Navbar() {
         <Link
           href="/"
           onClick={(event) => handleNav(event, "/")}
-          className="font-display text-2xl tracking-tight text-ink transition-colors hover:text-lilac md:text-[1.75rem]"
+          // Compressed to 0.85 of its height like the name in the hero, with the
+          // leading cut by the same factor so the box shrinks with the letters.
+          // Squeezing towards the box bottom drops the baseline a hair below the
+          // nav links', so it is lifted back by the same amount — in em, so it
+          // holds at both the mobile and desktop sizes.
+          className="origin-bottom -translate-y-[0.036em] scale-y-[0.85] font-display text-2xl leading-[1.133] tracking-tight text-ink transition-colors hover:text-lilac md:text-[1.75rem]"
         >
           RuiXuan Xu
         </Link>
