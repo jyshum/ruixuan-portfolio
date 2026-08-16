@@ -47,7 +47,7 @@ function Frame({ tile, wall, alt }: { tile: PhoneTile; wall: Wall; alt: string }
     >
       <Reveal
         delay={tile.delay}
-        className="group relative h-full w-full overflow-hidden rounded-[3px] bg-cream-300"
+        className="group relative h-full w-full overflow-hidden bg-cream-300"
       >
         {/* Blown up to 1/crop and pulled back by the crop origin, so the frame
             above shows exactly the part of the photo the layout called for. */}
@@ -87,9 +87,6 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
             className="wall-label"
             style={
               {
-                // The drawn size, as a share of the wall's own width so it
-                // tracks the composition instead of the viewport.
-                "--fs": `${((row.label.h / wall.ref.w) * 100 * 1.25).toFixed(3)}cqw`,
                 "--x": pct(row.label.x, wall.ref.w),
                 "--y": pct(row.label.y, wall.ref.h),
                 "--w": pct(row.label.w, wall.ref.w),
@@ -98,7 +95,7 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
             }
           >
             <Reveal>
-              <p className="whitespace-nowrap font-display italic leading-none tracking-[0.02em] text-ink">
+              <p className="whitespace-nowrap text-[0.7rem] uppercase tracking-[0.24em] text-ink-400">
                 {row.label.text}
               </p>
             </Reveal>
@@ -130,17 +127,24 @@ function Section({ category }: { category: Category }) {
         {/* rail — stays with you while the category scrolls past */}
         <div className="md:col-span-3">
           <div className="md:sticky md:top-28">
-            <p className="text-[0.7rem] uppercase tracking-[0.3em] text-lilac">
-              {category.index}
-            </p>
-            <h2 className="mt-3 font-display text-[2.5rem] leading-[0.95] tracking-[-0.02em] md:text-[3.25rem]">
-              {category.title}
-            </h2>
+            <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+              <h2 className="font-display text-[2.5rem] leading-[0.95] tracking-[-0.02em] md:text-[3.25rem]">
+                {category.title}
+              </h2>
+              {category.link && (
+                <a
+                  href={category.link.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="group relative text-[0.72rem] uppercase tracking-[0.2em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
+                >
+                  {category.link.label}
+                  <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 ease-out group-hover:scale-x-100 motion-reduce:transition-none" />
+                </a>
+              )}
+            </div>
             <p className="mt-5 max-w-xs text-[0.95rem] leading-relaxed text-ink-600">
               {category.blurb}
-            </p>
-            <p className="mt-5 text-[0.7rem] uppercase tracking-[0.24em] text-ink-400">
-              {category.wall.tiles.length} pieces
             </p>
           </div>
         </div>
@@ -159,8 +163,8 @@ function Opening() {
     <div className="scroll-mt-24 px-6 pb-4 pt-16 md:px-12 md:pb-8 md:pt-24">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-end gap-x-8 gap-y-8 md:grid-cols-12">
         <Reveal className="md:col-span-7">
-          <h2 className="font-display text-[min(11vw,9rem)] leading-[0.82] tracking-[-0.025em]">
-            Port<span className="italic text-lilac">folio</span>
+          <h2 className="font-display text-[min(11vw,9rem)] italic leading-[0.82] tracking-[-0.025em] text-lilac">
+            Portfolio
           </h2>
         </Reveal>
 

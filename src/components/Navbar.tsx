@@ -147,7 +147,7 @@ export default function Navbar() {
                   : "invisible -translate-y-1 opacity-0"
               }`}
             >
-              <ul className="min-w-[10.5rem] rounded-[3px] border border-ink/10 bg-cream-100 py-2 shadow-[0_8px_24px_-12px_rgba(43,38,32,0.28)]">
+              <ul className="min-w-[10.5rem] border border-ink/10 bg-cream-100 py-2 shadow-[0_8px_24px_-12px_rgba(43,38,32,0.28)]">
                 {sections.map(({ slug, title }) => (
                   <li key={slug}>
                     <Link

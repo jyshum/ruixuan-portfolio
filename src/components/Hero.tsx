@@ -53,16 +53,21 @@ export default function Hero() {
           </a>
         </p>
 
-        {/* name — the photo tucks up behind its baseline */}
-        <h1 className="relative z-20 font-display leading-[0.8] tracking-[-0.025em] text-ink md:col-span-12 md:row-start-2 md:mt-5">
-          <span className="block whitespace-nowrap text-[min(16vw,14rem)]">
-            RuiXuan <span className="italic text-lilac">Xu</span>
+        {/* name — the photo tucks up behind its baseline.
+            The letters are compressed to 0.85 of their height and the leading
+            is cut by the same factor, so the block shrinks with them rather
+            than leaving the empty band a bare transform would. */}
+        <h1 className="relative z-20 pl-1 font-display leading-[0.68] tracking-[-0.025em] text-ink md:col-span-12 md:row-start-2 md:mt-5 md:pl-4">
+          <span className="block origin-bottom scale-y-[0.85] whitespace-nowrap text-[min(16vw,14rem)]">
+            RuiXuan <span className="text-lilac">Xu</span>
           </span>
         </h1>
 
         {/* photo */}
         <div className="md:col-span-5 md:col-start-8 md:row-start-3 md:-mt-16 md:justify-self-end">
-          <div className="relative mx-auto w-[min(100%,20rem)] md:w-[22rem]">
+          {/* Wider than it was; the top edge is pinned by the negative margin
+              above, so the extra size grows down towards the bio. */}
+          <div className="relative mx-auto w-[min(100%,22rem)] md:w-[26rem]">
             {/* offset outline frame */}
             <div
               aria-hidden
@@ -98,21 +103,25 @@ export default function Hero() {
             ))}
           </div>
 
+          {/* Instagram is the ceramics club's account, so it sits with the Club
+              section instead of here. */}
           <ul className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3">
-            {contactLinks.map(({ label, href, external }) => (
-              <li key={label}>
-                <a
-                  href={href}
-                  {...(external
-                    ? { target: "_blank", rel: "noreferrer noopener" }
-                    : {})}
-                  className="group relative text-[0.72rem] uppercase tracking-[0.2em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
-                >
-                  {label}
-                  <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 ease-out group-hover:scale-x-100 motion-reduce:transition-none" />
-                </a>
-              </li>
-            ))}
+            {contactLinks
+              .filter(({ label }) => label !== "Instagram")
+              .map(({ label, href, external }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    {...(external
+                      ? { target: "_blank", rel: "noreferrer noopener" }
+                      : {})}
+                    className="group relative text-[0.72rem] uppercase tracking-[0.2em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
+                  >
+                    {label}
+                    <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 ease-out group-hover:scale-x-100 motion-reduce:transition-none" />
+                  </a>
+                </li>
+              ))}
           </ul>
         </div>
       </div>
