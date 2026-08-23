@@ -64,7 +64,7 @@ export default function Navbar() {
 
   /**
    * A Link pointing at the URL you are already on is a no-op in the router, so
-   * "About Me" and the wordmark did nothing until some other link had put a
+   * "About" and the wordmark did nothing until some other link had put a
    * hash in the address bar. Same-page targets are scrolled by hand instead.
    */
   function handleNav(event: MouseEvent<HTMLAnchorElement>, href: string) {
@@ -82,16 +82,16 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-cream">
-      <nav className="mx-auto flex max-w-[1400px] items-baseline justify-between px-6 py-6 md:px-12 md:py-8">
+      <nav className="mx-auto flex max-w-[1400px] items-baseline justify-between px-6 py-4 md:px-12 md:py-5">
         <Link
           href="/"
           onClick={(event) => handleNav(event, "/")}
-          className="font-display text-2xl tracking-tight text-ink transition-colors hover:text-lilac md:text-[1.75rem]"
+          className="font-display text-[1.15rem] tracking-tight text-ink transition-colors hover:text-lilac md:text-[1.3rem]"
         >
           RuiXuan Xu
         </Link>
 
-        <ul className="flex items-baseline gap-7 md:gap-10">
+        <ul className="flex items-baseline gap-6 md:gap-8">
           <li
             ref={menu}
             className="group relative"
@@ -104,7 +104,7 @@ export default function Navbar() {
               <Link
                 href="/#work"
                 onClick={(event) => handleNav(event, "/#work")}
-                className="relative text-[0.8rem] font-medium uppercase tracking-[0.18em] text-ink transition-colors group-hover:text-lilac md:text-[0.85rem]"
+                className="relative text-[0.68rem] font-medium uppercase tracking-[0.2em] text-ink transition-colors group-hover:text-lilac md:text-[0.7rem]"
               >
                 Portfolio
                 <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 group-hover:scale-x-100" />
@@ -157,7 +157,7 @@ export default function Navbar() {
                         handleNav(event, `/#${slug}`);
                         setOpen(false);
                       }}
-                      className="block px-4 py-2 text-[0.72rem] uppercase tracking-[0.18em] text-ink-600 transition-colors hover:bg-cream-300/50 hover:text-lilac"
+                      className="block px-4 py-2 text-[0.66rem] uppercase tracking-[0.2em] text-ink-600 transition-colors hover:bg-cream-300/50 hover:text-lilac"
                     >
                       {title}
                     </Link>
@@ -171,9 +171,9 @@ export default function Navbar() {
             <Link
               href="/"
               onClick={(event) => handleNav(event, "/")}
-              className="group/link relative text-[0.8rem] uppercase tracking-[0.18em] font-normal text-ink-400 transition-colors hover:text-ink-600 md:text-[0.85rem]"
+              className="group/link relative text-[0.68rem] uppercase tracking-[0.2em] font-normal text-ink-400 transition-colors hover:text-ink-600 md:text-[0.7rem]"
             >
-              About Me
+              About
               <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-ink-400 transition-transform duration-300 group-hover/link:scale-x-100" />
             </Link>
           </li>

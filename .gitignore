@@ -44,3 +44,6 @@ next-env.d.ts
 # archive they arrived in. Kept locally; too large to be worth versioning.
 /design/layouts/
 *.zip
+
+# Claude Code worktrees and local state
+.claude/

@@ -23,6 +23,7 @@ function pct(part: number, whole: number) {
 }
 
 function Frame({ tile, wall, alt }: { tile: PhoneTile; wall: Wall; alt: string }) {
+  const caption = wall.pieces[tile.piece];
   const [u0, v0, u1, v1] = tile.crop;
   const cw = u1 - u0;
   const ch = v1 - v0;
@@ -62,7 +63,7 @@ function Frame({ tile, wall, alt }: { tile: PhoneTile; wall: Wall; alt: string }
         >
           <Image
             src={tile.src}
-            alt={alt}
+            alt={caption ? `${caption} — ${alt}` : alt}
             fill
             loading="lazy"
             sizes={`(max-width: 768px) ${phone}vw, ${desk}vw`}
@@ -89,7 +90,7 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
               {
                 // The drawn size, as a share of the wall's own width so it
                 // tracks the composition instead of the viewport.
-                "--fs": `${((row.label.h / wall.ref.w) * 100 * 1.25).toFixed(3)}cqw`,
+                "--fs": `${((row.label.h / wall.ref.w) * 100 * 1.6).toFixed(3)}cqw`,
                 "--x": pct(row.label.x, wall.ref.w),
                 "--y": pct(row.label.y, wall.ref.h),
                 "--w": pct(row.label.w, wall.ref.w),
@@ -98,7 +99,7 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
             }
           >
             <Reveal>
-              <p className="whitespace-nowrap font-display italic leading-none tracking-[0.02em] text-ink">
+              <p className="whitespace-nowrap font-display italic leading-none tracking-[0.02em] text-lilac">
                 {row.label.text}
               </p>
             </Reveal>
@@ -124,29 +125,31 @@ function Section({ category }: { category: Category }) {
   return (
     <section
       id={category.slug}
-      className="scroll-mt-24 border-t border-ink/10 py-16 md:py-24"
+      className="scroll-mt-24 border-t border-ink/10 py-20 md:py-32"
     >
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-8 gap-y-10 px-6 md:grid-cols-12 md:px-12">
         {/* rail — stays with you while the category scrolls past */}
         <div className="md:col-span-3">
           <div className="md:sticky md:top-28">
-            <p className="text-[0.7rem] uppercase tracking-[0.3em] text-lilac">
+            <p className="text-[0.64rem] uppercase tracking-[0.32em] text-lilac">
               {category.index}
             </p>
-            <h2 className="mt-3 font-display text-[2.5rem] leading-[0.95] tracking-[-0.02em] md:text-[3.25rem]">
+            <h2 className="mt-4 font-display text-[2rem] leading-[0.95] tracking-[-0.02em] md:text-[2.5rem]">
               {category.title}
             </h2>
-            <p className="mt-5 max-w-xs text-[0.95rem] leading-relaxed text-ink-600">
-              {category.blurb}
-            </p>
-            <p className="mt-5 text-[0.7rem] uppercase tracking-[0.24em] text-ink-400">
+            <div className="mt-6 max-w-[17rem] space-y-4 text-[0.8rem] leading-[1.85] text-ink-600">
+              {category.blurb.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+            <p className="mt-7 text-[0.64rem] uppercase tracking-[0.28em] text-ink-400">
               {category.wall.tiles.length} pieces
             </p>
           </div>
         </div>
 
         {/* the wall */}
-        <div className="md:col-span-9">
+        <div className="md:col-span-8 md:col-start-5">
           <TheWall wall={category.wall} title={category.title} />
         </div>
       </div>
@@ -156,19 +159,18 @@ function Section({ category }: { category: Category }) {
 
 function Opening() {
   return (
-    <div className="scroll-mt-24 px-6 pb-4 pt-16 md:px-12 md:pb-8 md:pt-24">
+    <div className="scroll-mt-24 px-6 pb-10 pt-24 md:px-12 md:pb-16 md:pt-36">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-end gap-x-8 gap-y-8 md:grid-cols-12">
         <Reveal className="md:col-span-7">
-          <h2 className="font-display text-[min(11vw,9rem)] leading-[0.82] tracking-[-0.025em]">
+          <h2 className="font-display text-[min(8.5vw,7rem)] leading-[0.82] tracking-[-0.025em]">
             Port<span className="italic text-lilac">folio</span>
           </h2>
         </Reveal>
 
         <Reveal delay={100} className="md:col-span-4 md:col-start-9">
-          <p className="max-w-sm text-[0.95rem] leading-[1.75] text-ink-600 md:pb-3">
-            Placeholder — a few lines on where I want to take ceramics next: the
-            forms I want to keep chasing, the glazes and firings I still want to
-            test, and the kind of studio practice I hope to build around it.
+          <p className="max-w-[22rem] text-[0.85rem] leading-[1.9] text-ink-600 md:pb-2">
+            I hope to continue learning and expanding what I know about the
+            types of clay, forms and textures I can create.
           </p>
         </Reveal>
       </div>

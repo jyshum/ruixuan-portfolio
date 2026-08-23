@@ -68,7 +68,7 @@ body {
 
 .wall-label {
   /* the drawn size, but never so small it stops being readable */
-  font-size: max(0.82rem, var(--fs));
+  font-size: max(1.05rem, var(--fs));
 }
 
 @media (min-width: 768px) {
@@ -102,3 +102,4 @@ body {
     align-items: center;
   }
 }
+
