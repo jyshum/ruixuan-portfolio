@@ -82,7 +82,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-cream">
-      <nav className="mx-auto flex max-w-[1400px] items-baseline justify-between px-6 py-4 md:px-12 md:py-5">
+      <nav className="rise mx-auto flex max-w-[1400px] items-baseline justify-between px-6 py-4 md:px-12 md:py-5">
         <Link
           href="/"
           onClick={(event) => handleNav(event, "/")}

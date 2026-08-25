@@ -18,6 +18,13 @@ import { wallRows, type PhoneTile, type Wall } from "@/lib/walls";
  * To move a photo, change its x/y/w/h in walls.ts; they are plain pixels in the
  * 1685px-wide space of the layout screenshots in design/layouts/.
  */
+/**
+ * The widest any category's photo grid may draw. Every tile is placed as a
+ * share of its wall, so this single value scales all of them together —
+ * change it here rather than touching the walls in lib/walls.ts.
+ */
+const WALL_MAX = "md:max-w-[42rem]";
+
 function pct(part: number, whole: number) {
   return `${((part / whole) * 100).toFixed(4)}%`;
 }
@@ -148,8 +155,9 @@ function Section({ category }: { category: Category }) {
           </div>
         </div>
 
-        {/* the wall */}
-        <div className="md:col-span-8 md:col-start-5">
+        {/* the wall — pushed to the right margin so its edge stays on the
+            one the navbar and the hero share */}
+        <div className={`md:col-span-8 md:col-start-5 md:ml-auto md:w-full ${WALL_MAX}`}>
           <TheWall wall={category.wall} title={category.title} />
         </div>
       </div>
@@ -159,8 +167,8 @@ function Section({ category }: { category: Category }) {
 
 function Opening() {
   return (
-    <div className="scroll-mt-24 px-6 pb-10 pt-24 md:px-12 md:pb-16 md:pt-36">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-end gap-x-8 gap-y-8 md:grid-cols-12">
+    <div className="scroll-mt-24 pb-10 pt-24 md:pb-16 md:pt-36">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-end gap-x-8 gap-y-8 px-6 md:grid-cols-12 md:px-12">
         <Reveal className="md:col-span-7">
           <h2 className="font-display text-[min(8.5vw,7rem)] leading-[0.82] tracking-[-0.025em]">
             Port<span className="italic text-lilac">folio</span>

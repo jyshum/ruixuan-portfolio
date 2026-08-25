@@ -2,8 +2,6 @@ import Image from "next/image";
 
 import { contactLinks } from "@/lib/links";
 
-const ARCH = "999px 999px 6px 6px";
-
 const bio = [
   "My name is 许瑞轩 (RuiXuan Xu), I am an upcoming grade 12 student at Lord Byng Secondary school with passions in ceramics and pharmaceutical microbiology.",
   "Ceramics was first introduced to me through various art classes taken as a kid, I furthered my pursuit through 3D studio design courses inside and out of school, as well as running the Lord Byng Ceramics Club since 2022.",
@@ -12,19 +10,22 @@ const bio = [
 
 export default function Hero() {
   return (
-    <section className="relative overflow-x-clip px-6 pb-24 pt-10 md:px-12 md:pb-36 md:pt-16">
+    <section className="relative overflow-x-clip pb-24 pt-10 md:pb-36 md:pt-16">
       {/* soft lilac wash, kept faint so the page reads as cream */}
       <div
         aria-hidden
         className="pointer-events-none absolute -right-52 top-40 h-[34rem] w-[34rem] rounded-full bg-lilac-100/35 blur-[130px]"
       />
 
-      <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 gap-y-12 md:grid-cols-12 md:gap-x-8 md:gap-y-0">
+      <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 gap-y-12 px-6 md:grid-cols-12 md:gap-x-8 md:gap-y-0 md:px-12">
         {/* eyebrow */}
         {/* z-30: the name below sets 205px type on 164px leading, so its glyph
             box overflows ~20px above its own line box and — being z-20 so it can
             cover the photo — swallowed every click on the resume link. */}
-        <p className="relative z-30 flex items-center text-[0.66rem] uppercase tracking-[0.32em] text-ink-400 md:col-span-12 md:row-start-1 md:text-[0.68rem]">
+        <p
+          className="rise relative z-30 flex items-center text-[0.66rem] uppercase tracking-[0.32em] text-ink-400 md:col-span-12 md:row-start-1 md:text-[0.68rem]"
+          style={{ animationDelay: "60ms" }}
+        >
           Ceramics Portfolio
           <span aria-hidden className="mx-3 text-ink-400/45 md:mx-4">
             |
@@ -54,31 +55,39 @@ export default function Hero() {
         </p>
 
         {/* name — the photo tucks up behind its baseline */}
-        <h1 className="relative z-20 font-display leading-[0.8] tracking-[-0.025em] text-ink md:col-span-12 md:row-start-2 md:mt-9">
+        <h1
+          className="rise relative z-20 font-display leading-[0.8] tracking-[-0.025em] text-ink md:col-span-12 md:row-start-2 md:mt-9"
+          style={{ animationDelay: "160ms" }}
+        >
           <span className="block whitespace-nowrap text-[min(12vw,10rem)]">
             RuiXuan <span className="italic text-lilac">Xu</span>
           </span>
         </h1>
 
-        {/* photo */}
-        <div className="md:col-span-5 md:col-start-8 md:row-start-3 md:-mt-8 md:justify-self-end">
-          <div className="relative mx-auto w-[min(100%,17rem)] md:w-[18rem]">
+        {/* photo — centred in its five columns rather than pinned to the
+            right edge, so it sits in the space instead of hugging the margin.
+            Square corners: the arched top read as a locket next to type this
+            severe, and the straight edges line up with the walls below. */}
+        <div
+          className="rise md:col-span-5 md:col-start-8 md:row-start-3 md:-mt-10 md:justify-self-end"
+          style={{ animationDelay: "440ms" }}
+        >
+          {/* personalRuiPhoto.jpg is only 384x512, so anything past ~16rem is
+              upscaled on a 2x screen and goes soft. The 3/4 box is the file's
+              own ratio, which means the crop is lossless as well. */}
+          <div className="relative mx-auto w-[min(100%,16rem)] md:w-[16rem]">
             {/* offset outline frame */}
             <div
               aria-hidden
-              className="absolute inset-0 translate-x-3 translate-y-3 border border-lilac-300/70 md:translate-x-4 md:translate-y-4"
-              style={{ borderRadius: ARCH }}
+              className="absolute inset-0 translate-x-3 translate-y-3 border border-lilac-300/70 md:-translate-x-4 md:translate-y-4"
             />
-            <div
-              className="relative aspect-[3/4] w-full overflow-hidden bg-cream-300"
-              style={{ borderRadius: ARCH }}
-            >
+            <div className="relative aspect-[3/4] w-full overflow-hidden bg-cream-300">
               <Image
                 src="/personalRuiPhoto.jpg"
                 alt="RuiXuan Xu loading glazed work into a kiln"
                 fill
                 priority
-                sizes="(max-width: 768px) 75vw, 18rem"
+                sizes="(max-width: 768px) 70vw, 16rem"
                 className="object-cover object-[58%_center]"
               />
             </div>
@@ -86,7 +95,10 @@ export default function Hero() {
         </div>
 
         {/* bio */}
-        <div className="md:col-span-6 md:col-start-1 md:row-start-3 md:mt-16 md:self-start">
+        <div
+          className="rise md:col-span-6 md:col-start-1 md:row-start-3 md:mt-16 md:self-start"
+          style={{ animationDelay: "300ms" }}
+        >
           {/* The opening line carries the name and the headline facts, so it
               is set a step up from the two that follow. The hierarchy is what
               keeps the block from reading as one undifferentiated slab. */}
