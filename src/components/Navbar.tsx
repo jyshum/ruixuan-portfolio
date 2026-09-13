@@ -86,7 +86,7 @@ export default function Navbar() {
         <Link
           href="/"
           onClick={(event) => handleNav(event, "/")}
-          className="font-display text-[1.15rem] tracking-tight text-ink transition-colors hover:text-lilac md:text-[1.3rem]"
+          className="inline-block origin-bottom scale-y-[0.85] font-display text-[1.15rem] tracking-tight text-ink transition-colors hover:text-lilac md:text-[1.3rem]"
         >
           RuiXuan Xu
         </Link>

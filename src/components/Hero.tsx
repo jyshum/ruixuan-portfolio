@@ -3,9 +3,8 @@ import Image from "next/image";
 import { contactLinks } from "@/lib/links";
 
 const bio = [
-  "My name is 许瑞轩 (RuiXuan Xu), I am an upcoming grade 12 student at Lord Byng Secondary school with passions in ceramics and pharmaceutical microbiology.",
+  "My name is 许瑞轩 (RuiXuan Xu), I am a grade 12 student at Lord Byng Secondary school with passions in ceramics and pharmaceutical microbiology.",
   "Ceramics was first introduced to me through various art classes taken as a kid, I furthered my pursuit through 3D studio design courses inside and out of school, as well as running the Lord Byng Ceramics Club since 2022.",
-  "I hope to continue fusing wheeled bases with handbuilt spirals, florals and intrinsic design, while furthering and sharing my skills of experimentation with the materials around me.",
 ];
 
 export default function Hero() {
@@ -54,85 +53,76 @@ export default function Hero() {
           </a>
         </p>
 
-        {/* name — the photo tucks up behind its baseline */}
+        {/* name — its own row, so the photo can tuck up behind its baseline
+            rather than being squeezed to match the text column's height. */}
         <h1
-          className="rise relative z-20 font-display leading-[0.8] tracking-[-0.025em] text-ink md:col-span-12 md:row-start-2 md:mt-9"
+          className="rise relative z-20 font-display leading-[0.8] tracking-[-0.025em] text-ink md:col-span-6 md:row-start-2 md:mt-9"
           style={{ animationDelay: "160ms" }}
         >
-          <span className="block whitespace-nowrap text-[min(12vw,10rem)]">
+          <span className="block origin-bottom scale-y-[0.85] whitespace-nowrap text-[min(12vw,10rem)]">
             RuiXuan <span className="italic text-lilac">Xu</span>
           </span>
         </h1>
 
-        {/* photo — centred in its five columns rather than pinned to the
-            right edge, so it sits in the space instead of hugging the margin.
-            Square corners: the arched top read as a locket next to type this
-            severe, and the straight edges line up with the walls below. */}
-        <div
-          className="rise md:col-span-5 md:col-start-8 md:row-start-3 md:-mt-10 md:justify-self-end"
-          style={{ animationDelay: "440ms" }}
-        >
-          {/* personalRuiPhoto.jpg is only 384x512, so anything past ~16rem is
-              upscaled on a 2x screen and goes soft. The 3/4 box is the file's
-              own ratio, which means the crop is lossless as well. */}
-          <div className="relative mx-auto w-[min(100%,16rem)] md:w-[16rem]">
-            {/* offset outline frame */}
+        {/* bio + links on the left; the photo on the right, pulled up to
+            overlap the name's baseline the way it originally sat. */}
+        <div className="grid grid-cols-1 gap-y-12 md:col-span-12 md:row-start-3 md:mt-9 md:grid-cols-12 md:items-start md:gap-x-8 md:gap-y-0">
+          <div
+            className="rise flex flex-col md:col-span-6"
+            style={{ animationDelay: "300ms" }}
+          >
+            <div className="max-w-[32rem] space-y-5">
+              {bio.map((paragraph) => (
+                <p
+                  key={paragraph.slice(0, 24)}
+                  className="text-[1rem] leading-[1.7] text-ink md:text-[1.05rem]"
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            <ul className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3">
+              {contactLinks.map(({ label, href, external }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    {...(external
+                      ? { target: "_blank", rel: "noreferrer noopener" }
+                      : {})}
+                    className="group relative text-[0.66rem] uppercase tracking-[0.24em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
+                  >
+                    {label}
+                    <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 ease-out group-hover:scale-x-100 motion-reduce:transition-none" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* photo — sized to hero-photo.jpg's own 16:9 ratio so the frame
+              never crops it top or bottom; 95% width for a touch smaller,
+              dropped down so its top lines up with "pharmaceutical" in the
+              bio line above. */}
+          <div
+            className="rise relative mt-12 md:col-span-6 md:mt-0 md:w-[95%] md:translate-y-[31px]"
+            style={{ animationDelay: "440ms" }}
+          >
             <div
               aria-hidden
-              className="absolute inset-0 translate-x-3 translate-y-3 border border-lilac-300/70 md:-translate-x-4 md:translate-y-4"
+              className="absolute inset-0 translate-x-3 translate-y-3 border border-lilac-300/70 md:translate-x-4"
             />
-            <div className="relative aspect-[3/4] w-full overflow-hidden bg-cream-300">
+            <div className="relative aspect-[16/9] w-full overflow-hidden bg-cream-300">
               <Image
-                src="/personalRuiPhoto.jpg"
-                alt="RuiXuan Xu loading glazed work into a kiln"
+                src="/hero-photo.jpg"
+                alt="RuiXuan Xu photographing work in the ceramics studio"
                 fill
                 priority
-                sizes="(max-width: 768px) 70vw, 16rem"
-                className="object-cover object-[58%_center]"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain"
               />
             </div>
           </div>
-        </div>
-
-        {/* bio */}
-        <div
-          className="rise md:col-span-6 md:col-start-1 md:row-start-3 md:mt-16 md:self-start"
-          style={{ animationDelay: "300ms" }}
-        >
-          {/* The opening line carries the name and the headline facts, so it
-              is set a step up from the two that follow. The hierarchy is what
-              keeps the block from reading as one undifferentiated slab. */}
-          <div className="max-w-[32rem] space-y-5">
-            {bio.map((paragraph, i) => (
-              <p
-                key={paragraph.slice(0, 24)}
-                className={
-                  i === 0
-                    ? "text-[1rem] leading-[1.7] text-ink md:text-[1.05rem]"
-                    : "text-[0.85rem] leading-[1.85] text-ink-600 md:text-[0.875rem]"
-                }
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-
-          <ul className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3">
-            {contactLinks.map(({ label, href, external }) => (
-              <li key={label}>
-                <a
-                  href={href}
-                  {...(external
-                    ? { target: "_blank", rel: "noreferrer noopener" }
-                    : {})}
-                  className="group relative text-[0.66rem] uppercase tracking-[0.24em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
-                >
-                  {label}
-                  <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 ease-out group-hover:scale-x-100 motion-reduce:transition-none" />
-                </a>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>
