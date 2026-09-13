@@ -9,6 +9,10 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
+        <div aria-hidden className="my-16 space-y-3 md:my-24">
+          <div className="h-px w-full bg-lilac-300/70" />
+          <div className="h-px w-full bg-lilac-300/70" />
+        </div>
         <Portfolio />
       </main>
       <Footer />

@@ -55,7 +55,7 @@ function Frame({ tile, wall, alt }: { tile: PhoneTile; wall: Wall; alt: string }
     >
       <Reveal
         delay={tile.delay}
-        className="group relative h-full w-full overflow-hidden rounded-[3px] bg-cream-300"
+        className="group relative h-full w-full scale-[0.97] overflow-hidden bg-cream-300"
       >
         {/* Blown up to 1/crop and pulled back by the crop origin, so the frame
             above shows exactly the part of the photo the layout called for. */}
@@ -106,7 +106,7 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
             }
           >
             <Reveal>
-              <p className="whitespace-nowrap font-display italic leading-none tracking-[0.02em] text-lilac">
+              <p className="whitespace-nowrap text-[0.64rem] uppercase tracking-[0.28em] text-ink-400">
                 {row.label.text}
               </p>
             </Reveal>
@@ -128,15 +128,23 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
   );
 }
 
+/** Same hollow rectangle as the one between the hero and the portfolio,
+ *  reused here to separate each category instead of a plain border. */
+function SectionDivider() {
+  return (
+    <div
+      aria-hidden
+      className="mx-auto aspect-[100/1.5] w-3/5 border border-lilac-300/70"
+    />
+  );
+}
+
 function Section({ category }: { category: Category }) {
   return (
-    <section
-      id={category.slug}
-      className="scroll-mt-24 border-t border-ink/10 py-20 md:py-32"
-    >
+    <section id={category.slug} className="scroll-mt-24 py-20 md:py-32">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-8 gap-y-10 px-6 md:grid-cols-12 md:px-12">
         {/* rail — stays with you while the category scrolls past */}
-        <div className="md:col-span-3">
+        <div className="md:col-span-4">
           <div className="md:sticky md:top-28">
             <p className="text-[0.64rem] uppercase tracking-[0.32em] text-lilac">
               {category.index}
@@ -144,20 +152,17 @@ function Section({ category }: { category: Category }) {
             <h2 className="mt-4 font-display text-[2rem] leading-[0.95] tracking-[-0.02em] md:text-[2.5rem]">
               {category.title}
             </h2>
-            <div className="mt-6 max-w-[17rem] space-y-4 text-[0.8rem] leading-[1.85] text-ink-600">
+            <div className="mt-6 space-y-4 text-[0.944rem] leading-[1.85] text-ink-600">
               {category.blurb.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
             </div>
-            <p className="mt-7 text-[0.64rem] uppercase tracking-[0.28em] text-ink-400">
-              {category.wall.tiles.length} pieces
-            </p>
           </div>
         </div>
 
         {/* the wall — pushed to the right margin so its edge stays on the
             one the navbar and the hero share */}
-        <div className={`md:col-span-8 md:col-start-5 md:ml-auto md:w-full ${WALL_MAX}`}>
+        <div className={`md:col-span-7 md:col-start-6 md:ml-auto md:w-full ${WALL_MAX}`}>
           <TheWall wall={category.wall} title={category.title} />
         </div>
       </div>
@@ -169,17 +174,20 @@ function Opening() {
   return (
     <div className="scroll-mt-24 pb-10 pt-24 md:pb-16 md:pt-36">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-end gap-x-8 gap-y-8 px-6 md:grid-cols-12 md:px-12">
-        <Reveal className="md:col-span-7">
+        <Reveal className="md:col-span-6">
           <h2 className="font-display text-[min(8.5vw,7rem)] leading-[0.82] tracking-[-0.025em]">
             Port<span className="italic text-lilac">folio</span>
           </h2>
         </Reveal>
 
-        <Reveal delay={100} className="md:col-span-4 md:col-start-9">
-          <p className="max-w-[22rem] text-[0.85rem] leading-[1.9] text-ink-600 md:pb-2">
-            I hope to continue learning and expanding what I know about the
-            types of clay, forms and textures I can create.
-          </p>
+        <Reveal delay={100} className="md:col-span-6 md:col-start-7">
+          <div className="w-full space-y-4 text-[1.003rem] leading-[1.9] text-ink-600 md:pb-2">
+            <p>
+              I hope to continue fusing wheeled bases with handbuilt spirals,
+              florals and intrinsic design, while furthering and sharing my
+              skills of experimentation with the materials around me.
+            </p>
+          </div>
         </Reveal>
       </div>
     </div>
@@ -190,8 +198,11 @@ export default function Portfolio() {
   return (
     <div id="work" className="scroll-mt-20">
       <Opening />
-      {categories.map((category) => (
-        <Section key={category.slug} category={category} />
+      {categories.map((category, i) => (
+        <div key={category.slug}>
+          {i > 0 && <SectionDivider />}
+          <Section category={category} />
+        </div>
       ))}
     </div>
   );
