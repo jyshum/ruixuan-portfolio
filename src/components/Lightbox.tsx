@@ -66,15 +66,6 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
 
   const current = state ? state.images[state.index] : null;
 
-  // Splits at the midpoint of the *image's own* rendered box — not the
-  // surrounding backdrop — so a click only steps the gallery when it lands
-  // on the picture itself.
-  function stepFromClickX(event: { currentTarget: HTMLElement; clientX: number }) {
-    if (!state || state.images.length < 2) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    step(event.clientX - rect.left < rect.width / 2 ? -1 : 1);
-  }
-
   return (
     <LightboxContext.Provider value={open}>
       {children}
@@ -95,32 +86,55 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
           </button>
 
           <div className="flex max-w-3xl flex-col items-center gap-4">
-            {/* eslint-disable-next-line @next/next/no-img-element -- sized to
-                its own content (w-auto h-auto) so the click band below can
-                match the picture's real, rendered bounds; next/image's fill
-                mode can't do that without knowing the source's pixel size. */}
-            <img
-              src={current.src}
-              alt={current.alt}
-              onClick={(event) => {
-                event.stopPropagation();
-                stepFromClickX(event);
-              }}
+            {/* Full viewport width but only as tall as the photo — a skinny
+                photo still gets the whole screen's width to click through,
+                without eating into the close button's corner above it. */}
+            <div
+              className="relative left-1/2 w-screen -translate-x-1/2"
               onTouchStart={(event) => {
-                event.stopPropagation();
                 touchStartX.current = event.touches[0].clientX;
               }}
               onTouchEnd={(event) => {
-                event.stopPropagation();
                 if (touchStartX.current === null) return;
                 const delta = event.changedTouches[0].clientX - touchStartX.current;
                 if (Math.abs(delta) > SWIPE_THRESHOLD) step(delta < 0 ? 1 : -1);
                 touchStartX.current = null;
               }}
-              className={`h-auto max-h-[62vh] w-auto max-w-full select-none object-contain md:max-h-[68vh] ${
-                state.images.length > 1 ? "cursor-pointer" : ""
-              }`}
-            />
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- sized
+                  to its own content (w-auto h-auto) so this row's height
+                  matches the picture's real, rendered bounds; next/image's
+                  fill mode can't do that without knowing the source's pixel
+                  size. */}
+              <img
+                src={current.src}
+                alt={current.alt}
+                className="mx-auto h-auto max-h-[62vh] w-auto max-w-full select-none object-contain md:max-h-[68vh]"
+              />
+
+              {state.images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Previous photo"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      step(-1);
+                    }}
+                    className="absolute inset-y-0 left-0 w-1/2 cursor-w-resize"
+                  />
+                  <button
+                    type="button"
+                    aria-label="Next photo"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      step(1);
+                    }}
+                    className="absolute inset-y-0 right-0 w-1/2 cursor-e-resize"
+                  />
+                </>
+              )}
+            </div>
 
             {current.caption && (
               <p
