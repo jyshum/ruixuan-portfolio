@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   createContext,
   useCallback,
@@ -11,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-export type LightboxImage = { src: string; alt: string };
+export type LightboxImage = { src: string; alt: string; caption?: string };
 
 type LightboxState = { images: LightboxImage[]; index: number } | null;
 
@@ -67,69 +66,80 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
 
   const current = state ? state.images[state.index] : null;
 
+  // Splits at the midpoint of the *image's own* rendered box — not the
+  // surrounding backdrop — so a click only steps the gallery when it lands
+  // on the picture itself.
+  function stepFromClickX(event: { currentTarget: HTMLElement; clientX: number }) {
+    if (!state || state.images.length < 2) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    step(event.clientX - rect.left < rect.width / 2 ? -1 : 1);
+  }
+
   return (
     <LightboxContext.Provider value={open}>
       {children}
       {state && current && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/95 p-4 md:p-10"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 bg-ink/95 p-4 md:p-10"
           onClick={close}
-          onTouchStart={(event) => {
-            touchStartX.current = event.touches[0].clientX;
-          }}
-          onTouchEnd={(event) => {
-            if (touchStartX.current === null) return;
-            const delta = event.changedTouches[0].clientX - touchStartX.current;
-            if (Math.abs(delta) > SWIPE_THRESHOLD) step(delta < 0 ? 1 : -1);
-            touchStartX.current = null;
-          }}
         >
+          {/* z-10 keeps this above the picture's click band — the band used
+              to reach right up under this corner and swallow the tap. */}
           <button
             type="button"
             aria-label="Close"
             onClick={close}
-            className="absolute right-4 top-4 text-[2rem] font-display leading-none text-cream-100/80 transition-colors hover:text-cream-100 md:right-8 md:top-8"
+            className="absolute right-4 top-4 z-10 text-[2rem] font-display leading-none text-cream-100/80 transition-colors hover:text-cream-100 md:right-8 md:top-8"
           >
             &times;
           </button>
 
-          <div
-            className="relative h-full w-full max-w-5xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <Image
+          <div className="flex max-w-3xl flex-col items-center gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element -- sized to
+                its own content (w-auto h-auto) so the click band below can
+                match the picture's real, rendered bounds; next/image's fill
+                mode can't do that without knowing the source's pixel size. */}
+            <img
               src={current.src}
               alt={current.alt}
-              fill
-              sizes="100vw"
-              className="object-contain"
+              onClick={(event) => {
+                event.stopPropagation();
+                stepFromClickX(event);
+              }}
+              onTouchStart={(event) => {
+                event.stopPropagation();
+                touchStartX.current = event.touches[0].clientX;
+              }}
+              onTouchEnd={(event) => {
+                event.stopPropagation();
+                if (touchStartX.current === null) return;
+                const delta = event.changedTouches[0].clientX - touchStartX.current;
+                if (Math.abs(delta) > SWIPE_THRESHOLD) step(delta < 0 ? 1 : -1);
+                touchStartX.current = null;
+              }}
+              className={`h-auto max-h-[62vh] w-auto max-w-full select-none object-contain md:max-h-[68vh] ${
+                state.images.length > 1 ? "cursor-pointer" : ""
+              }`}
             />
 
-            {/* left half steps back, right half steps forward — no arrows,
-                the photo itself is the control */}
+            {current.caption && (
+              <p
+                onClick={(event) => event.stopPropagation()}
+                className="max-w-2xl px-2 text-center text-[1.003rem] leading-[1.9] text-cream-100"
+              >
+                {current.caption}
+              </p>
+            )}
+
             {state.images.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  aria-label="Previous photo"
-                  onClick={() => step(-1)}
-                  className="absolute inset-y-0 left-0 w-1/2 cursor-w-resize"
-                />
-                <button
-                  type="button"
-                  aria-label="Next photo"
-                  onClick={() => step(1)}
-                  className="absolute inset-y-0 right-0 w-1/2 cursor-e-resize"
-                />
-              </>
+              <p
+                onClick={(event) => event.stopPropagation()}
+                className="text-[0.64rem] uppercase tracking-[0.28em] text-cream-100/60"
+              >
+                {state.index + 1} / {state.images.length}
+              </p>
             )}
           </div>
-
-          {state.images.length > 1 && (
-            <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[0.64rem] uppercase tracking-[0.28em] text-cream-100/60">
-              {state.index + 1} / {state.images.length}
-            </p>
-          )}
         </div>
       )}
     </LightboxContext.Provider>

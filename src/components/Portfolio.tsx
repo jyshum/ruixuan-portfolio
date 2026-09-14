@@ -111,7 +111,11 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
   // rather than whatever order rows happened to wrap into on a phone.
   const images: LightboxImage[] = wall.tiles.map((tile) => {
     const caption = wall.pieces[tile.piece];
-    return { src: tile.src, alt: caption ? `${caption} — ${alt}` : alt };
+    return {
+      src: tile.src,
+      alt: caption ? `${caption} — ${alt}` : alt,
+      caption,
+    };
   });
   const indexByKey = new Map(
     wall.tiles.map((tile, i) => [`${tile.src}-${tile.x}-${tile.y}`, i]),
