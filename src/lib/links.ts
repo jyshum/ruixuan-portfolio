@@ -25,7 +25,7 @@ export const contactLinks: ContactLink[] = [
     external: true,
   },
   {
-    label: "Instagram",
+    label: "IG: roi_fish_",
     href: "https://www.instagram.com/roi_fish_/?hl=en",
     external: true,
   },
