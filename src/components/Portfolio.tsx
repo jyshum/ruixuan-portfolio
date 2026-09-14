@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import type { CSSProperties } from "react";
 
+import { LightboxProvider, useLightbox, type LightboxImage } from "./Lightbox";
 import Reveal from "./Reveal";
 import { categories, type Category } from "@/lib/portfolio";
 import { wallRows, type PhoneTile, type Wall } from "@/lib/walls";
@@ -29,11 +32,25 @@ function pct(part: number, whole: number) {
   return `${((part / whole) * 100).toFixed(4)}%`;
 }
 
-function Frame({ tile, wall, alt }: { tile: PhoneTile; wall: Wall; alt: string }) {
+function Frame({
+  tile,
+  wall,
+  alt,
+  images,
+  index,
+}: {
+  tile: PhoneTile;
+  wall: Wall;
+  alt: string;
+  images: LightboxImage[];
+  index: number;
+}) {
   const caption = wall.pieces[tile.piece];
+  const fullAlt = caption ? `${caption} — ${alt}` : alt;
   const [u0, v0, u1, v1] = tile.crop;
   const cw = u1 - u0;
   const ch = v1 - v0;
+  const open = useLightbox();
 
   // How much of the viewport the photo covers, before the crop scales it up:
   // most of the row on a phone, a share of the 9-of-12 column from md up.
@@ -53,36 +70,52 @@ function Frame({ tile, wall, alt }: { tile: PhoneTile; wall: Wall; alt: string }
         } as CSSProperties
       }
     >
-      <Reveal
-        delay={tile.delay}
-        className="group relative h-full w-full scale-[0.97] overflow-hidden bg-cream-300"
-      >
-        {/* Blown up to 1/crop and pulled back by the crop origin, so the frame
-            above shows exactly the part of the photo the layout called for. */}
-        <div
-          className="absolute transition-transform duration-[1200ms] ease-out group-hover:scale-[1.035] motion-reduce:transition-none"
-          style={{
-            width: `${(100 / cw).toFixed(4)}%`,
-            height: `${(100 / ch).toFixed(4)}%`,
-            left: `${((-u0 / cw) * 100).toFixed(4)}%`,
-            top: `${((-v0 / ch) * 100).toFixed(4)}%`,
-          }}
+      <Reveal delay={tile.delay} className="h-full w-full">
+        <button
+          type="button"
+          onClick={() => open(images, index)}
+          aria-label={`View larger: ${fullAlt}`}
+          className="group relative block h-full w-full scale-[0.97] cursor-pointer overflow-hidden bg-cream-300"
         >
-          <Image
-            src={tile.src}
-            alt={caption ? `${caption} — ${alt}` : alt}
-            fill
-            loading="lazy"
-            sizes={`(max-width: 768px) ${phone}vw, ${desk}vw`}
-            style={{ objectFit: "cover" }}
-          />
-        </div>
+          {/* Blown up to 1/crop and pulled back by the crop origin, so the frame
+              above shows exactly the part of the photo the layout called for. */}
+          <div
+            className="absolute transition-transform duration-[1200ms] ease-out group-hover:scale-[1.035] motion-reduce:transition-none"
+            style={{
+              width: `${(100 / cw).toFixed(4)}%`,
+              height: `${(100 / ch).toFixed(4)}%`,
+              left: `${((-u0 / cw) * 100).toFixed(4)}%`,
+              top: `${((-v0 / ch) * 100).toFixed(4)}%`,
+            }}
+          >
+            <Image
+              src={tile.src}
+              alt={fullAlt}
+              fill
+              loading="lazy"
+              sizes={`(max-width: 768px) ${phone}vw, ${desk}vw`}
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+        </button>
       </Reveal>
     </div>
   );
 }
 
 function TheWall({ wall, title }: { wall: Wall; title: string }) {
+  const alt = `Ceramic work by RuiXuan Xu — ${title}`;
+  // The lightbox gallery follows the original tile order (not the phone
+  // reflow), so swiping through it matches the desktop composition's flow
+  // rather than whatever order rows happened to wrap into on a phone.
+  const images: LightboxImage[] = wall.tiles.map((tile) => {
+    const caption = wall.pieces[tile.piece];
+    return { src: tile.src, alt: caption ? `${caption} — ${alt}` : alt };
+  });
+  const indexByKey = new Map(
+    wall.tiles.map((tile, i) => [`${tile.src}-${tile.x}-${tile.y}`, i]),
+  );
+
   return (
     <div
       className="wall w-full [container-type:inline-size]"
@@ -113,14 +146,19 @@ function TheWall({ wall, title }: { wall: Wall; title: string }) {
           </div>
         ) : (
           <div key={`row-${row.y}-${row.tiles[0].src}`} className="wall-row">
-            {row.tiles.map((tile) => (
-              <Frame
-                key={`${tile.src}-${tile.x}-${tile.y}`}
-                tile={tile}
-                wall={wall}
-                alt={`Ceramic work by RuiXuan Xu — ${title}`}
-              />
-            ))}
+            {row.tiles.map((tile) => {
+              const key = `${tile.src}-${tile.x}-${tile.y}`;
+              return (
+                <Frame
+                  key={key}
+                  tile={tile}
+                  wall={wall}
+                  alt={alt}
+                  images={images}
+                  index={indexByKey.get(key) ?? 0}
+                />
+              );
+            })}
           </div>
         ),
       )}
@@ -212,14 +250,16 @@ function Opening() {
 
 export default function Portfolio() {
   return (
-    <div id="work" className="scroll-mt-20">
-      <Opening />
-      {categories.map((category, i) => (
-        <div key={category.slug}>
-          {i > 0 && <SectionDivider />}
-          <Section category={category} />
-        </div>
-      ))}
-    </div>
+    <LightboxProvider>
+      <div id="work" className="scroll-mt-20">
+        <Opening />
+        {categories.map((category, i) => (
+          <div key={category.slug}>
+            {i > 0 && <SectionDivider />}
+            <Section category={category} />
+          </div>
+        ))}
+      </div>
+    </LightboxProvider>
   );
 }
