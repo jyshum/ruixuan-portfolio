@@ -90,7 +90,7 @@ export default function Hero() {
                     {...(external
                       ? { target: "_blank", rel: "noreferrer noopener" }
                       : {})}
-                    className="group relative text-[0.66rem] uppercase tracking-[0.24em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
+                    className="group relative text-[0.66rem] uppercase tracking-[0.168em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
                   >
                     {label}
                     <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 ease-out group-hover:scale-x-100 motion-reduce:transition-none" />
