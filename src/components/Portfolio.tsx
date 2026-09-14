@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 
 import { LightboxProvider, useLightbox, type LightboxImage } from "./Lightbox";
 import Reveal from "./Reveal";
+import { clubInstagramLink } from "@/lib/links";
 import { categories, type Category } from "@/lib/portfolio";
 import { wallRows, type PhoneTile, type Wall } from "@/lib/walls";
 
@@ -199,9 +200,22 @@ function Section({ category }: { category: Category }) {
             <p className="text-[0.64rem] uppercase tracking-[0.32em] text-lilac">
               {category.index}
             </p>
-            <h2 className="mt-4 font-display text-[2rem] leading-[0.95] tracking-[-0.02em] md:text-[2.5rem]">
-              {category.title}
-            </h2>
+            <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <h2 className="font-display text-[2rem] leading-[0.95] tracking-[-0.02em] md:text-[2.5rem]">
+                {category.title}
+              </h2>
+              {category.slug === "club" && (
+                <a
+                  href={clubInstagramLink.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="group relative text-[0.66rem] uppercase tracking-[0.24em] text-ink-600 transition-colors duration-300 hover:text-lilac motion-reduce:transition-none"
+                >
+                  {clubInstagramLink.label}
+                  <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-lilac transition-transform duration-300 ease-out group-hover:scale-x-100 motion-reduce:transition-none" />
+                </a>
+              )}
+            </div>
             <div className="mt-6 space-y-4 text-[0.944rem] leading-[1.85] text-ink-600">
               {category.blurb.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>

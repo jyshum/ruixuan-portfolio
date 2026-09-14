@@ -26,7 +26,7 @@ export const contactLinks: ContactLink[] = [
   },
   {
     label: "Instagram",
-    href: "https://www.instagram.com/c3ramicsclub/",
+    href: "https://www.instagram.com/roi_fish_/?hl=en",
     external: true,
   },
   {
@@ -35,3 +35,11 @@ export const contactLinks: ContactLink[] = [
     external: false,
   },
 ];
+
+/** The club's own Instagram — sits beside its title in the portfolio
+ *  section rather than in the hero's personal contact list. */
+export const clubInstagramLink: ContactLink = {
+  label: "IG: @c3ramicsclub",
+  href: "https://www.instagram.com/c3ramicsclub/",
+  external: true,
+};
