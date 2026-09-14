@@ -140,11 +140,23 @@ function SectionDivider() {
 }
 
 function Section({ category }: { category: Category }) {
+  // School alternates sides with its neighbours — the rail moves to the
+  // right and the wall to the left. The wall's own composition is mirrored
+  // in lib/walls.ts (each tile's x reflected across the wall's width), so
+  // this is a true flip of the layout, not just the two columns swapping.
+  const flip = category.slug === "school";
+
   return (
     <section id={category.slug} className="scroll-mt-24 py-20 md:py-32">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-8 gap-y-10 px-6 md:grid-cols-12 md:px-12">
-        {/* rail — stays with you while the category scrolls past */}
-        <div className="md:col-span-4">
+        {/* rail — stays with you while the category scrolls past.
+            row-start-1 on both this and the wall below is load-bearing: with
+            the wall's column-start coming *before* the rail's in source
+            order, grid auto-placement would otherwise push the wall to row
+            2, since its cursor can't move backward within a row — which
+            silently breaks both the alignment and the sticky containing
+            block. */}
+        <div className={`md:col-span-4 md:row-start-1 ${flip ? "md:col-start-9" : ""}`}>
           <div className="md:sticky md:top-28">
             <p className="text-[0.64rem] uppercase tracking-[0.32em] text-lilac">
               {category.index}
@@ -160,9 +172,13 @@ function Section({ category }: { category: Category }) {
           </div>
         </div>
 
-        {/* the wall — pushed to the right margin so its edge stays on the
-            one the navbar and the hero share */}
-        <div className={`md:col-span-7 md:col-start-6 md:ml-auto md:w-full ${WALL_MAX}`}>
+        {/* the wall — pushed to the outer margin so its edge stays on the
+            one the navbar and the hero share, whichever side it's on */}
+        <div
+          className={`md:col-span-7 md:row-start-1 md:w-full ${
+            flip ? "md:col-start-1 md:mr-auto" : "md:col-start-6 md:ml-auto"
+          } ${WALL_MAX}`}
+        >
           <TheWall wall={category.wall} title={category.title} />
         </div>
       </div>
