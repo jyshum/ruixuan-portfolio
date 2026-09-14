@@ -93,20 +93,6 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
             &times;
           </button>
 
-          {state.images.length > 1 && (
-            <button
-              type="button"
-              aria-label="Previous photo"
-              onClick={(event) => {
-                event.stopPropagation();
-                step(-1);
-              }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-3 text-[2rem] font-display leading-none text-cream-100/80 transition-colors hover:text-cream-100 md:left-6"
-            >
-              &lsaquo;
-            </button>
-          )}
-
           <div
             className="relative h-full w-full max-w-5xl"
             onClick={(event) => event.stopPropagation()}
@@ -118,21 +104,26 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
               sizes="100vw"
               className="object-contain"
             />
-          </div>
 
-          {state.images.length > 1 && (
-            <button
-              type="button"
-              aria-label="Next photo"
-              onClick={(event) => {
-                event.stopPropagation();
-                step(1);
-              }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-3 text-[2rem] font-display leading-none text-cream-100/80 transition-colors hover:text-cream-100 md:right-6"
-            >
-              &rsaquo;
-            </button>
-          )}
+            {/* left half steps back, right half steps forward — no arrows,
+                the photo itself is the control */}
+            {state.images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous photo"
+                  onClick={() => step(-1)}
+                  className="absolute inset-y-0 left-0 w-1/2 cursor-w-resize"
+                />
+                <button
+                  type="button"
+                  aria-label="Next photo"
+                  onClick={() => step(1)}
+                  className="absolute inset-y-0 right-0 w-1/2 cursor-e-resize"
+                />
+              </>
+            )}
+          </div>
 
           {state.images.length > 1 && (
             <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[0.64rem] uppercase tracking-[0.28em] text-cream-100/60">
