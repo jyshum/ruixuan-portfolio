@@ -75,7 +75,7 @@ export default function Hero() {
               {bio.map((paragraph) => (
                 <p
                   key={paragraph.slice(0, 24)}
-                  className="text-[1rem] leading-[1.7] text-ink md:text-[1.05rem]"
+                  className="text-[1.003rem] leading-[1.7] text-ink"
                 >
                   {paragraph}
                 </p>
